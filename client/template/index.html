@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket Chat</title>
+    <style>
+      #chat-log {
+        padding: 10px;
+        border: 1px solid #ccc;
+        width: 500px;
+        height: 300px;
+        overflow-y: scroll;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Chat</h1>
+    <div id="chat-log"></div>
+    <input id="message-input" type="text" placeholder="Type a message..." />
+    <button id="send-button">Send</button>
+
+    <script>
+      const chatLog = document.getElementById("chat-log");
+      const messageInput = document.getElementById("message-input");
+      const sendButton = document.getElementById("send-button");
+
+      const socket = new WebSocket("ws://localhost:8080/ws-room");
+
+      socket.onmessage = (event) => {
+        const message = event.data;
+        const messageElement = document.createElement("div");
+        messageElement.textContent = message;
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      };
+
+      sendButton.addEventListener("click", () => {
+        if (socket.readyState === WebSocket.OPEN) {
+          const message = messageInput.value;
+          socket.send(message);
+          messageInput.value = "";
+        } else {
+          console.log("WebSocket is not connected.");
+        }
+      });
+
+      socket.onopen = () => {
+        console.log("Connected to the WebSocket server!");
+      };
+
+      socket.onclose = () => {
+        console.log("Disconnected from the WebSocket server!");
+      };
+
+      socket.onerror = (error) => {
+        console.log("Error occurred:", error);
+      };
+    </script>
+  </body>
+</html>
