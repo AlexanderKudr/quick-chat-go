@@ -1,7 +1,5 @@
 # Chat Application
 
-## Choosing between WebSockets and SSE
-
 >Use WebSockets when:
 - You need bi-directional communication.
 - You require low latency and efficient communication.
