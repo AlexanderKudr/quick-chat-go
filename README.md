@@ -1,7 +1,5 @@
 # Chat Application
 
-A real-time chat application built with Go and WebSockets.
-
 ## Choosing between WebSockets and SSE
 
 >Use WebSockets when:
