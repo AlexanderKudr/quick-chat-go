@@ -3,9 +3,6 @@ package ws
 import (
 	"log"
 	"net/http"
-	"path/filepath"
-	"sync"
-	"text/template"
 
 	"github.com/gorilla/websocket"
 )
@@ -103,22 +100,4 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer func() { r.leave <- client }()
 	go client.write()
 	client.read()
-}
-
-type TemplateHandler struct {
-	once     sync.Once
-	Filename string
-	templ    *template.Template
-}
-
-func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	t.once.Do(func() {
-		t.templ = template.Must(template.ParseFiles(filepath.Join("template", t.Filename)))
-	})
-
-	if t.templ == nil {
-		log.Fatal("Failed to parse template")
-	}
-
-	t.templ.Execute(w, r)
 }

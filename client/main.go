@@ -3,17 +3,20 @@ package main
 import (
 	"log"
 	"net/http"
-	lib "quick-chat-go/client/lib"
+
+	"quick-chat-go/client/pkg"
+	template "quick-chat-go/client/template"
 )
+
+const port = ":8080"
 
 func main() {
 
-	wsRoom := lib.NewRoom()
-	http.Handle("/", &lib.TemplateHandler{Filename: "index.html"})
+	wsRoom := ws.NewRoom()
+	http.Handle("/ws", &template.TemplateHandler{Filename: "index.html"})
 	http.Handle("/ws-room", wsRoom)
 	go wsRoom.Run()
 
-	port := ":8080"
 	log.Println("Serving at", port)
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
