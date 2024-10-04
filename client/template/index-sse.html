@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SSE Chat</title>
+    <style>
+      #chat-log {
+        padding: 10px;
+        border: 1px solid #ccc;
+        width: 500px;
+        height: 300px;
+        overflow-y: scroll;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SSE Chat</h1>
+    <div id="chat-log"></div>
+    <input id="message-input" type="text" placeholder="Type a message..." />
+    <button id="send-button">Send</button>
+
+    <script>
+      const chatLog = document.getElementById("chat-log");
+      const messageInput = document.getElementById("message-input");
+      const sendButton = document.getElementById("send-button");
+
+      const eventSource = new EventSource("http://localhost:8080/sse-room");
+
+      eventSource.onmessage = (event) => {
+        console.log("trigger", event);
+        const messageElement = document.createElement("div");
+        messageElement.textContent = event.data;
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      };
+
+      sendButton.addEventListener("click", () => {
+        if (eventSource.readyState === EventSource.OPEN) {
+          const message = messageInput.value;
+          fetch("http://localhost:8080/send-message", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ data: message }),
+          });
+          messageInput.value = "";
+        } else {
+          console.log("SSE connection is not open.");
+        }
+      });
+
+      eventSource.onopen = () => {
+        console.log("Connected to the SSE server!");
+      };
+
+      eventSource.onerror = () => {
+        console.log("Error occurred with the SSE connection.");
+      };
+    </script>
+  </body>
+</html>

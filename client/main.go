@@ -5,20 +5,37 @@ import (
 	"net/http"
 
 	"quick-chat-go/client/pkg"
-	"quick-chat-go/client/template"
+	tmpl "quick-chat-go/client/template"
 )
 
 const port = ":8080"
 
-func main() {
+func handleTemplatess() {
+	http.Handle("/ws", tmpl.Template("index-ws.html"))
+	http.Handle("/sse", tmpl.Template("index-sse.html"))
+}
 
-	wsRoom := ws.NewRoom()
-	http.Handle("/ws", &serve.TemplateHandler{Filename: "index.html"})
+func handleWebsockets() {
+	wsRoom := pkg.NewRoom()
 	http.Handle("/ws-room", wsRoom)
 	go wsRoom.Run()
+}
 
+func handleSse() {
+	http.HandleFunc("/sse-room", pkg.SSEHandler)
+	http.HandleFunc("/send-message", pkg.ReceiveEvent)
+}
+
+func serve() {
 	log.Println("Serving at", port)
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
+}
+
+func main() {
+	handleTemplatess()
+	handleWebsockets()
+	handleSse()
+	serve()
 }

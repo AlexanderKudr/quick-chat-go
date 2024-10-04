@@ -1,4 +1,4 @@
-package serve
+package template
 
 import (
 	"log"
@@ -24,4 +24,8 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t.templ.Execute(w, r)
+}
+
+func Template(filename string) *TemplateHandler {
+	return &TemplateHandler{Filename: filename}
 }
